@@ -171,9 +171,12 @@ async function handleToolCall(name, args) {
         raw = headers.join('\r\n');
       }
 
+      // Gmail API requires the raw field to be base64url-encoded
+      const encodedRaw = Buffer.from(raw).toString('base64url');
+
       const response = await gmail.users.messages.send({
         userId: 'me',
-        requestBody: { raw },
+        requestBody: { raw: encodedRaw },
       });
 
       return { content: [{ type: 'text', text: `Email sent successfully! ID: ${response.data.id}` }] };
